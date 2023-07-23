@@ -103,7 +103,13 @@ module.exports = {
             // if ( password !== ceklogin.password ) throw {message: "password salah"}
 
             const payload = {id: ceklogin.id}
-            const token = jwt.sign(payload, process.env.KEY_TOKEN, {expiresIn: '1h'})
+            const token = jwt.sign(payload, process.env.KEY_TOKEN, {expiresIn: '1d'})
+            await user.update(
+                {token:token},
+                {where: {
+                    id:ceklogin.id
+                }}
+                )
         res.status(200).send({
                 status : true,
                 message : 'berhasil login',
@@ -144,7 +150,24 @@ module.exports = {
         if (!result) throw {message: "email tidak terdaftar"}
         const payload = {id: result.id}
         const token = jwt.sign(payload, process.env.KEY_TOKEN, {expiresIn: '1h'})
+        
             res.status(200).send({message:"Cek email",token})
+            
+            const data = await fs.readFileSync('./reset.html', 'utf-8')
+            const tempCompile  = await handlebars.compile(data)
+            const tempResult = tempCompile({token})
+            await transporter.sendMail({
+                from:"kuga@gmail.com",
+                to: email,
+                subject: "Reset Password",
+                html:tempResult
+            })
+            await user.update(
+                {token:token},
+                {where: {
+                    id:result.id
+                }}
+                )
         } catch (error) {
             console.log(error);
             res.status(400).send(error)
@@ -156,7 +179,15 @@ module.exports = {
             try {
                 const {password, confirmpassword} = req.body
                 // if(confirmpassword !== password) throw {message: "password tidak sesuai"}
-
+                const cektoken = await user.findOne(
+                    {
+                        where : {
+                            id : req.user.id
+                        }
+                    }
+                )
+                if(req.token == cektoken.token){
+               
                 const salt = await bcrypt.genSalt(10)
                 const hashPassword = await bcrypt.hash(password, salt)
                 const result = await user.update(
@@ -166,9 +197,18 @@ module.exports = {
                         }
                     }
                     )
-                    
+                    const hapustoken = await user.update(
+                        {token : null},
+                        {
+                        where:{ 
+                            id: req.user.id
+                              }
+                        }
+                    )
                     res.status(200).send({result, message:"password berhasil diubah"})
-            } catch (error) {
+            }
+            else{throw{message:"token salah"}}
+        } catch (error) {
                 console.log(error);
                 res.status(400).send(error)
             }

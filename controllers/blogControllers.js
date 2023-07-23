@@ -50,11 +50,11 @@ module.exports = {
                 attributes:["username"]
             }, 
             categori],
-            attributes:["judul","UserId","konten","imgBlog","keyword","negara","KategoriId",
+            attributes:["id","judul","konten","link","keyword","negara","KategoriId","UserId","imgBlog",
             [Sequelize.literal(
                 "(SELECT COUNT(*) FROM likes WHERE likes.BlogId = blog.id)"),"totalLike"
             ]]
-            ,where:search,limit, offset:offset,order:[["createdAt","ASC"],["createdAt","DESC"]]}) 
+            ,where:search,limit, offset:offset,order:[["createdAt","DESC"],["createdAt","ASC"]]}) 
             res.status(200).send({
                 totalpage: Math.ceil(total/limit),
                 currentpage: page,

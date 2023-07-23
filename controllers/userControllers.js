@@ -7,6 +7,7 @@ require('dotenv').config()
 const fs = require('fs')
 const handlebars = require('handlebars')
 const transporter = require('../middleware/mail')
+const { throws } = require('assert')
 
 
 module.exports = {
@@ -21,6 +22,7 @@ module.exports = {
                 }
             }
         )
+        if(req.token == userexist.token){
         console.log(userexist);
         const email = userexist.email
         if (currentusername !== userexist.username) throw {message:"username salah"}
@@ -33,6 +35,7 @@ module.exports = {
                 }
             }
         )
+        
         const data = await fs.readFileSync('./user.html', 'utf-8')
             const tempCompile  = await handlebars.compile(data)
             const tempResult = tempCompile({username : newusername})
@@ -44,7 +47,10 @@ module.exports = {
             })
         if(result[0]==0) throw {message:"gagal mengganti username"}
         res.status(200).send({message:"username berhasil diganti"})
-        } catch (error) {
+        
+        } 
+        else{throw{message:"token salah"}}
+    }catch (error) {
             console.log(error);
             res.status(400).send(error)
         }
@@ -65,7 +71,7 @@ module.exports = {
         if (newphone == phoneexist.phone) throw {message:"nomor telepon harus berbeda"}
 
         const email = phoneexist.email
-
+        if(req.token == phoneexist.token){
         const result = await user.update(
             {phone : newphone}, {
                 where:{
@@ -84,7 +90,11 @@ module.exports = {
         })
         if(result[0]==0) throw {message:"gagal mengganti nomor telepon"}
         res.status(200).send({message:"nomor telepon berhasil diganti"})
-        } catch (error) {
+        } 
+        else{
+            throw{message:"token salah"}
+        }
+        }catch (error) {
             console.log(error);
             res.status(400).send(error)
         }
@@ -104,6 +114,8 @@ module.exports = {
         if (currentemail !== emailexist.email) throw {message:"email salah"}
         if (newemail == emailexist.email) throw {message:"email harus berbeda"}
         
+        if(req.token == emailexist.token){
+
         const result = await user.update(
             {email : newemail,isVerified: false},
             {
@@ -134,7 +146,9 @@ module.exports = {
         })
         if(result[0]==0) throw {message:"gagal mengganti email"}
         res.status(200).send({message:"Silahkan verifikasi ulang",token})
-        } catch (error) {
+        }else{
+            throw{message:"token salah"}
+        }} catch (error) {
             console.log(error);
             res.status(400).send(error)
         }
@@ -160,6 +174,7 @@ module.exports = {
             const salt = await bcrypt.genSalt(10)
             const hashPassword = await bcrypt.hash(newPassword,salt)
 
+            if(req.token == userExist.token){
             const result = await user.update(
                 {password:hashPassword},
                 {where: {id: req.user.id}}
@@ -170,7 +185,9 @@ module.exports = {
                 result,
             })
 
-        } catch (err) {
+        } 
+        else{throw{message:"token salah"}}    
+    }catch (err) {
             console.log(err);
             res.status(400).send(err)
         }
@@ -189,7 +206,7 @@ module.exports = {
             
             })
             console.log(req.file);
-            res.status(200).send("test")
+            res.status(200).send("Berhasil merubah gambar profil")
         } catch (error) {
             res.status(400).send(error)
             console.log(error);

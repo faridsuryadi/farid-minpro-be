@@ -22,7 +22,7 @@ const fileFilter = (req,file,cb) => {
     const cekExt = extFilter.includes(file.mimetype.split('/')[1].toLowerCase())
     
     if(!cekExt){
-        cb(new Error("ext file salah",false))
+        cb(new Error("hanya menerima .jpg, .gif, dan .png serta maksimum file 1mb",false))
     }
     else{
         cb(null,true)
