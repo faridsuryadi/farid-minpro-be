@@ -37,8 +37,8 @@ module.exports = {
       }
     },
     cekEmail: async (req, res, next) =>{
-      await body('currentemail').notEmpty().withMessage("tidak boleh kosong").isEmail("Format Email salah").run(req)
-      await body('newemail').notEmpty().withMessage("tidak boleh kosong").isEmail("Format Email salah").run(req)
+      await body('currentemail').notEmpty().withMessage("tidak boleh kosong").isEmail().run(req)
+      await body('newemail').notEmpty().withMessage("tidak boleh kosong").isEmail().run(req)
       const validation = validationResult(req);
         
       if (validation.isEmpty()) {
@@ -54,7 +54,12 @@ module.exports = {
     cekPass: async (req, res, next) => {
         try {
           await body('currentPassword').trim().notEmpty().run(req);
-          await body('newPassword').trim().notEmpty().run(req);
+          await body('newPassword').trim().notEmpty().isStrongPassword({
+            minLength: 6,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers : 1,
+            minSymbols : 1}).withMessage("Password minimal 6 karakter dan harus berisikan 1 huruf besar dan kecil serta 1 simbol dan angka").run(req);
           await body('confirmPassword').trim().notEmpty().equals(req.body.newPassword).withMessage("password tidak cocok").run(req);
           const validation = validationResult(req);
           

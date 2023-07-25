@@ -7,7 +7,7 @@ router.post('/',cekRegis, authControllers.register)
 router.post('/login',cekLogin, authControllers.login)
 router.get('/keep',verifyToken, authControllers.keepLogin)
 router.patch('/verify',verifyToken, authControllers.verify)
-router.post('/forgot', authControllers.forgotPassword)
+router.put('/forgot', authControllers.forgotPassword)
 router.patch('/reset',verifyToken,cekReset, authControllers.resetPassword)
 
 module.exports = router

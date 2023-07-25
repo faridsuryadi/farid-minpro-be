@@ -13,6 +13,8 @@ module.exports = {
             const limit = +req.query.limit||10;
             const offset = (page - 1) * limit;
             const search = {}
+            const sort = req.query.sort || 'DESC'
+            const sortBy = req.query.sortBy || `createdAt`
             const {judul, Kategori} = req.query
             if(judul){
                 search.judul = {
@@ -54,7 +56,7 @@ module.exports = {
             [Sequelize.literal(
                 "(SELECT COUNT(*) FROM likes WHERE likes.BlogId = blog.id)"),"totalLike"
             ]]
-            ,where:search,limit, offset:offset,order:[["createdAt","DESC"],["createdAt","ASC"]]}) 
+            ,where:search,limit, offset:offset,order:[[sortBy,sort]]}) 
             res.status(200).send({
                 totalpage: Math.ceil(total/limit),
                 currentpage: page,

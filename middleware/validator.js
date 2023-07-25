@@ -5,7 +5,7 @@ module.exports = {
     cekRegis : async(req,res,next)=>{
         try {
             await body('username').notEmpty().withMessage("tidak boleh kosong").isAlphanumeric().withMessage("Tidak boleh ada simbol").run(req)
-            await body('email').notEmpty().withMessage("tidak boleh kosong").isEmail("Format Email salah").run(req)
+            await body('email').notEmpty().withMessage("tidak boleh kosong").isEmail().run(req)
             await body('phone').notEmpty().withMessage("tidak boleh kosong").isMobilePhone('id-ID').withMessage("Nomor telepon indonesia").run(req)
             await body('password').notEmpty().withMessage("tidak boleh kosong").isStrongPassword({
                 minLength: 6,

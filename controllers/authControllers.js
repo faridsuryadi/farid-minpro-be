@@ -82,8 +82,8 @@ module.exports = {
     login : async(req,res) => {
         try {
            const username = req.body.username || ""
-           const phone = req.body.username || ""
-           const email = req.body.username || ""
+           const phone = req.body.phone || ""
+           const email = req.body.email || ""
            const password = req.body.password
             const ceklogin = await user.findOne({
                 where : {
